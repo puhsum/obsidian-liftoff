@@ -198,6 +198,7 @@
 	justify-content: center;
 	gap: 8px;
 	padding: 10px 16px;
+	margin-top: -4px;
 	margin-bottom: 12px;
 	border-radius: 10px;
 	background: var(--interactive-accent);
@@ -522,6 +523,14 @@
 	border-radius: 12px;
 }
 
+.ln-timer-countin {
+	border-radius: 12px;
+}
+
+.ln-timer-block-phase-countdown {
+	color: var(--text-muted);
+}
+
 .ln-timer-block-done-label {
 	font-size: 16px;
 	font-weight: 600;
@@ -725,6 +734,11 @@
 	margin-top: 16px;
 }
 
+/* Mobile: lift the bottom actions clear of Obsidian's mobile toolbar + iOS safe area */
+.is-mobile .ln-workout-actions {
+	padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 64px);
+}
+
 .ln-add-exercise-btn {
 	width: 100%;
 	padding: 14px;
@@ -795,6 +809,11 @@
 .ln-exercise-create {
 	color: var(--interactive-accent);
 	font-weight: 500;
+}
+
+/* Mobile: extra bottom padding so the last picker items can be scrolled above the on-screen keyboard */
+.is-mobile .ln-exercise-picker {
+	padding-bottom: calc(30vh + env(safe-area-inset-bottom, 0px));
 }
 
 /* --- Timer --- */

@@ -61,6 +61,8 @@ export class ExerciseLibraryModal extends Modal {
 
 		if (entry.exerciseType === "timer") {
 			nameRow.createSpan({ cls: "ln-el-type-badge", text: "\u23F1" });
+		} else if (entry.exerciseType === "cardio") {
+			nameRow.createSpan({ cls: "ln-el-type-badge", text: "\uD83C\uDFC3" });
 		}
 		nameRow.createSpan({ cls: "ln-el-name", text: entry.name });
 
@@ -115,25 +117,26 @@ export class ExerciseLibraryModal extends Modal {
 		const typeToggle = typeRow.createDiv({ cls: "ln-el-type-toggle" });
 
 		const weightBtn = typeToggle.createEl("button", {
-			cls: `ln-el-type-btn ${entry.exerciseType !== "timer" ? "ln-el-type-btn-active" : ""}`,
+			cls: `ln-el-type-btn ${!entry.exerciseType || entry.exerciseType === "weight" ? "ln-el-type-btn-active" : ""}`,
 			text: "Weight",
 		});
 		const timerBtn = typeToggle.createEl("button", {
 			cls: `ln-el-type-btn ${entry.exerciseType === "timer" ? "ln-el-type-btn-active" : ""}`,
 			text: "Timer",
 		});
+		const cardioBtn = typeToggle.createEl("button", {
+			cls: `ln-el-type-btn ${entry.exerciseType === "cardio" ? "ln-el-type-btn-active" : ""}`,
+			text: "Cardio",
+		});
 
 		let currentType: ExerciseType = entry.exerciseType ?? "weight";
-		weightBtn.addEventListener("click", () => {
-			currentType = "weight";
-			weightBtn.addClass("ln-el-type-btn-active");
-			timerBtn.removeClass("ln-el-type-btn-active");
-		});
-		timerBtn.addEventListener("click", () => {
-			currentType = "timer";
-			timerBtn.addClass("ln-el-type-btn-active");
-			weightBtn.removeClass("ln-el-type-btn-active");
-		});
+		const setActive = (btn: HTMLElement) => {
+			[weightBtn, timerBtn, cardioBtn].forEach((b) => b.removeClass("ln-el-type-btn-active"));
+			btn.addClass("ln-el-type-btn-active");
+		};
+		weightBtn.addEventListener("click", () => { currentType = "weight"; setActive(weightBtn); });
+		timerBtn.addEventListener("click", () => { currentType = "timer"; setActive(timerBtn); });
+		cardioBtn.addEventListener("click", () => { currentType = "cardio"; setActive(cardioBtn); });
 
 		// Notes
 		row.createDiv({ cls: "ln-el-edit-label", text: "Notes" });

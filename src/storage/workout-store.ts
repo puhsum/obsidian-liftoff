@@ -76,6 +76,7 @@ export class WorkoutStore {
 		if (Array.isArray(fm.exercises)) {
 			for (const ex of fm.exercises as Array<Record<string, unknown>>) {
 				const isTimer = ex.exerciseType === "timer";
+				const isCardio = ex.exerciseType === "cardio";
 				if (isTimer) {
 					exercises.push({
 						name: String(ex.name),
@@ -84,6 +85,13 @@ export class WorkoutStore {
 						workSeconds: Number(ex.workSeconds) || 0,
 						restSeconds: Number(ex.restSeconds) || 0,
 						intervals: Number(ex.intervals) || 0,
+					});
+				} else if (isCardio) {
+					exercises.push({
+						name: String(ex.name),
+						exerciseType: "cardio",
+						sets: [],
+						duration: ex.duration ? String(ex.duration) : undefined,
 					});
 				} else {
 					const sets: WorkoutSet[] = [];

@@ -93,3 +93,61 @@ describe("timer exercise markdown body", () => {
 		expect(result).not.toContain("Weight");
 	});
 });
+
+const cardioWorkout: Workout = {
+	type: "workout",
+	template: "Cardio Day",
+	date: "2026-03-21",
+	start: "08:00",
+	end: "08:45",
+	duration: 45,
+	exercises: [
+		{
+			name: "Run",
+			exerciseType: "cardio",
+			sets: [],
+			duration: "5:00",
+		},
+	],
+};
+
+describe("cardio exercise frontmatter", () => {
+	it("serializes cardio exercise with duration", () => {
+		const result = workoutToFrontmatter(cardioWorkout);
+		expect(result).toContain("exerciseType: cardio");
+		expect(result).toContain("duration: 5:00");
+		expect(result).not.toContain("weight:");
+		expect(result).not.toContain("sets:");
+		expect(result).not.toContain("workSeconds:");
+	});
+
+	it("omits duration field when not recorded", () => {
+		const noTime: Workout = {
+			...cardioWorkout,
+			exercises: [{ name: "Run", exerciseType: "cardio", sets: [] }],
+		};
+		const result = workoutToFrontmatter(noTime);
+		expect(result).toContain("exerciseType: cardio");
+		// workout-level "duration: 45" is fine; exercise-level duration must be absent
+		expect(result).not.toContain("    duration:");
+	});
+});
+
+describe("cardio exercise markdown body", () => {
+	it("renders duration for cardio exercises", () => {
+		const result = workoutToMarkdownBody(cardioWorkout);
+		expect(result).toContain("## Run");
+		expect(result).toContain("Duration: 5:00");
+		expect(result).not.toContain("Weight");
+		expect(result).not.toContain("Intervals:");
+	});
+
+	it("renders em dash when no duration recorded", () => {
+		const noTime: Workout = {
+			...cardioWorkout,
+			exercises: [{ name: "Run", exerciseType: "cardio", sets: [] }],
+		};
+		const result = workoutToMarkdownBody(noTime);
+		expect(result).toContain("Duration: —");
+	});
+});

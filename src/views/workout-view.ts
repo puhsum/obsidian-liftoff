@@ -78,6 +78,13 @@ export class WorkoutView extends ItemView {
 					intervals: te.targetSets,
 				};
 			}
+			if (exerciseType === "cardio") {
+				return {
+					name: te.name,
+					exerciseType: "cardio" as const,
+					sets: [],
+				};
+			}
 			return {
 				name: te.name,
 				exerciseType: exerciseType,
@@ -132,6 +139,8 @@ export class WorkoutView extends ItemView {
 				if (lastData.workSeconds !== undefined) exercise.workSeconds = lastData.workSeconds;
 				if (lastData.restSeconds !== undefined) exercise.restSeconds = lastData.restSeconds;
 				if (lastData.intervals !== undefined) exercise.intervals = lastData.intervals;
+			} else if (exercise.exerciseType === "cardio") {
+				// Cardio always starts a fresh stopwatch; history is shown as a reference label only
 			} else {
 				for (let i = 0; i < exercise.sets.length; i++) {
 					const prev = lastData.sets[i];
@@ -346,16 +355,15 @@ export class WorkoutView extends ItemView {
 		if (!existing) {
 			this.plugin.settings.exerciseLibrary.push({ name, exerciseType });
 			void this.plugin.saveSettings();
-		} else if (!existing.exerciseType && exerciseType === "timer") {
+		} else if (!existing.exerciseType && (exerciseType === "timer" || exerciseType === "cardio")) {
 			existing.exerciseType = exerciseType;
 			void this.plugin.saveSettings();
 		}
 
-		const isTimer = exerciseType === "timer";
 		const lastData = findLastSetsForExercise(this.recentWorkouts, name);
 
 		let newExercise: Exercise;
-		if (isTimer) {
+		if (exerciseType === "timer") {
 			newExercise = {
 				name,
 				exerciseType,
@@ -363,6 +371,12 @@ export class WorkoutView extends ItemView {
 				workSeconds: lastData?.workSeconds ?? this.plugin.settings.defaultWorkDuration,
 				restSeconds: lastData?.restSeconds ?? this.plugin.settings.defaultRestIntervalDuration,
 				intervals: lastData?.intervals ?? 5,
+			};
+		} else if (exerciseType === "cardio") {
+			newExercise = {
+				name,
+				exerciseType,
+				sets: [],
 			};
 		} else {
 			newExercise = {
@@ -396,9 +410,10 @@ export class WorkoutView extends ItemView {
 
 		this.workout.exercises = this.exerciseCards.map((c) => c.getExercise());
 
-		this.workout.exercises = this.workout.exercises.filter(
-			(e) => e.sets.some((s) => s.completed)
-		);
+		this.workout.exercises = this.workout.exercises.filter((e) => {
+			if (e.exerciseType === "cardio") return !!e.duration;
+			return e.sets.some((s) => s.completed);
+		});
 
 		if (this.workout.exercises.length === 0) {
 			new Notice("No completed sets to save.");

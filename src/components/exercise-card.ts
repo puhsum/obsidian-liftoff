@@ -2,6 +2,7 @@ import type { Exercise, WorkoutSet, LiftOffSettings } from "../types";
 import type { LastExerciseData } from "../utils/history";
 import { SetRow } from "./set-row";
 import { TimerBlock } from "./timer-block";
+import { CardioBlock } from "./cardio-block";
 
 export interface ExerciseCardCallbacks {
 	onExerciseChanged: (exercise: Exercise) => void;
@@ -18,6 +19,7 @@ export class ExerciseCard {
 	private setsContainerEl: HTMLElement;
 	private setRows: SetRowLike[] = [];
 	private timerBlock: TimerBlock | null = null;
+	private cardioBlock: CardioBlock | null = null;
 	private expanded: boolean;
 
 	constructor(
@@ -37,10 +39,15 @@ export class ExerciseCard {
 		return this.exercise.exerciseType === "timer";
 	}
 
+	private get isCardio(): boolean {
+		return this.exercise.exerciseType === "cardio";
+	}
+
 	private render(): void {
 		this.containerEl.empty();
 		this.setRows = [];
 		this.timerBlock = null;
+		this.cardioBlock = null;
 
 		// Header
 		const header = this.containerEl.createDiv({ cls: "ln-exercise-header" });
@@ -61,6 +68,11 @@ export class ExerciseCard {
 			headerRight.createSpan({
 				cls: "ln-exercise-set-count",
 				text: `\u23F1 ${this.exercise.intervals ?? this.settings.defaultWorkDuration}`,
+			});
+		} else if (this.isCardio) {
+			headerRight.createSpan({
+				cls: "ln-exercise-set-count",
+				text: this.exercise.duration ? `\uD83C\uDFC3 ${this.exercise.duration}` : "\uD83C\uDFC3",
 			});
 		} else {
 			const completedCount = this.exercise.sets.filter((s) => s.completed).length;
@@ -94,6 +106,8 @@ export class ExerciseCard {
 
 		if (this.isTimer) {
 			this.renderTimer();
+		} else if (this.isCardio) {
+			this.renderCardio();
 		} else {
 			this.renderWeightSets();
 		}
@@ -130,6 +144,26 @@ export class ExerciseCard {
 					this.exercise.workSeconds = w;
 					this.exercise.restSeconds = r;
 					this.exercise.intervals = n;
+					this.callbacks.onExerciseChanged(this.exercise);
+				},
+			}
+		);
+	}
+
+	private renderCardio(): void {
+		if (this.lastData?.lastDuration) {
+			this.containerEl.createDiv({
+				cls: "ln-exercise-previous",
+				text: `Previous: ${this.lastData.lastDuration}`,
+			});
+		}
+
+		this.cardioBlock = new CardioBlock(
+			this.containerEl,
+			this.exercise.duration,
+			{
+				onChanged: (duration) => {
+					this.exercise.duration = duration;
 					this.callbacks.onExerciseChanged(this.exercise);
 				},
 			}
@@ -252,6 +286,14 @@ export class ExerciseCard {
 					: [],
 			};
 		}
+		if (this.isCardio) {
+			return {
+				name: this.exercise.name,
+				exerciseType: "cardio",
+				sets: [],
+				duration: this.cardioBlock?.getDuration() ?? this.exercise.duration,
+			};
+		}
 		return {
 			name: this.exercise.name,
 			exerciseType: this.exercise.exerciseType,
@@ -261,6 +303,7 @@ export class ExerciseCard {
 
 	destroy(): void {
 		this.timerBlock?.destroy();
+		this.cardioBlock?.destroy();
 		this.containerEl.remove();
 	}
 }

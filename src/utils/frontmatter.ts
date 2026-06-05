@@ -1,4 +1,5 @@
 import type { Workout } from "../types";
+import { formatDuration } from "./duration";
 
 export function workoutToFrontmatter(workout: Workout): string {
 	const lines: string[] = ["---"];
@@ -24,6 +25,11 @@ export function workoutToFrontmatter(workout: Workout): string {
 			lines.push(`    workSeconds: ${exercise.workSeconds ?? 0}`);
 			lines.push(`    restSeconds: ${exercise.restSeconds ?? 0}`);
 			lines.push(`    intervals: ${exercise.intervals ?? 0}`);
+		} else if (exercise.exerciseType === "cardio") {
+			lines.push(`    exerciseType: cardio`);
+			if (exercise.duration) {
+				lines.push(`    duration: ${exercise.duration}`);
+			}
 		} else {
 			lines.push("    sets:");
 			for (const set of exercise.sets) {
@@ -36,11 +42,6 @@ export function workoutToFrontmatter(workout: Workout): string {
 	return lines.join("\n");
 }
 
-function formatTime(seconds: number): string {
-	const m = Math.floor(seconds / 60);
-	const s = seconds % 60;
-	return `${m}:${String(s).padStart(2, "0")}`;
-}
 
 export function workoutToMarkdownBody(workout: Workout): string {
 	const title = workout.template ?? "Workout";
@@ -58,10 +59,12 @@ export function workoutToMarkdownBody(workout: Workout): string {
 	for (const exercise of workout.exercises) {
 		lines.push(`## ${exercise.name}`);
 		if (exercise.exerciseType === "timer") {
-			const w = formatTime(exercise.workSeconds ?? 0);
-			const r = formatTime(exercise.restSeconds ?? 0);
+			const w = formatDuration(exercise.workSeconds ?? 0);
+			const r = formatDuration(exercise.restSeconds ?? 0);
 			const n = exercise.intervals ?? 0;
 			lines.push(`Intervals: ${n} \u00D7 ${w} work / ${r} rest`);
+		} else if (exercise.exerciseType === "cardio") {
+			lines.push(`Duration: ${exercise.duration ?? "\u2014"}`);
 		} else {
 			lines.push("| Set | Weight | Reps |");
 			lines.push("|-----|--------|------|");

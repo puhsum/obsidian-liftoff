@@ -1,4 +1,4 @@
-export type ExerciseType = "weight" | "timer";
+export type ExerciseType = "weight" | "timer" | "cardio";
 
 export interface WorkoutSet {
 	weight: number;
@@ -15,6 +15,8 @@ export interface Exercise {
 	workSeconds?: number;
 	restSeconds?: number;
 	intervals?: number;
+	// Cardio-specific (only used when exerciseType === "cardio")
+	duration?: string; // "mm:ss"
 }
 
 export interface Workout {

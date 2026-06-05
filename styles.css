@@ -638,8 +638,80 @@
 	opacity: 0.8;
 }
 
-.ln-exercise-create-timer {
+.ln-exercise-create-timer,
+.ln-exercise-create-cardio {
 	color: var(--text-muted);
+}
+
+/* --- Cardio Block --- */
+.ln-cardio-block {
+	text-align: center;
+	padding: 8px 0;
+}
+
+.ln-cardio-display {
+	font-size: 48px;
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+	letter-spacing: 2px;
+	padding: 16px 0;
+	color: var(--text-normal);
+}
+
+.ln-cardio-display-running {
+	color: var(--interactive-accent);
+}
+
+.ln-cardio-input {
+	font-size: 36px;
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+	letter-spacing: 2px;
+	padding: 12px 16px;
+	border-radius: 10px;
+	border: 2px solid var(--interactive-accent);
+	background: var(--background-primary);
+	color: var(--interactive-accent);
+	text-align: center;
+	width: 160px;
+	box-sizing: border-box;
+	margin-bottom: 12px;
+	-webkit-appearance: none;
+	appearance: none;
+}
+
+.ln-cardio-input:focus {
+	outline: none;
+}
+
+.ln-cardio-btn {
+	width: 100%;
+	padding: 14px;
+	font-size: 15px;
+	font-weight: 600;
+	border-radius: 10px;
+	border: none;
+	cursor: pointer;
+}
+
+.ln-cardio-btn:active {
+	opacity: 0.8;
+}
+
+.ln-cardio-start-btn {
+	background: var(--interactive-accent);
+	color: var(--text-on-accent);
+}
+
+.ln-cardio-stop-btn {
+	background: var(--color-red, #e44);
+	color: white;
+}
+
+.ln-cardio-reset-btn {
+	background: var(--background-primary);
+	color: var(--text-muted);
+	margin-top: 8px;
 }
 
 /* --- Exercise Library Modal --- */

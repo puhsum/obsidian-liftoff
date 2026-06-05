@@ -7,6 +7,8 @@ export interface LastExerciseData {
 	workSeconds?: number;
 	restSeconds?: number;
 	intervals?: number;
+	// Cardio exercise data
+	lastDuration?: string;
 }
 
 /**
@@ -30,6 +32,7 @@ export function findLastSetsForExercise(
 				workSeconds: exercise.workSeconds,
 				restSeconds: exercise.restSeconds,
 				intervals: exercise.intervals,
+				lastDuration: exercise.duration,
 			};
 		}
 	}
